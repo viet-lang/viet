@@ -1,0 +1,14 @@
+// Tìm fibonacci với hàm đệ qui và bộ nhớ đệm
+
+// Khởi tạo 3 giá trị đầu
+biến đệm = [0, 1, 1]
+
+hàm tìmFibonacci(sốThứ)
+    // Trả về giá trị đã tìm
+    nếu đệm[sốThứ] thì trả đệm[sốThứ]
+    // Tìm và gán vào đệm
+    trả đệm[sốThứ] = tìmFibonacci(sốThứ-2) + tìmFibonacci(sốThứ - 1)
+xong
+
+// In ra số thứ 30 trong dãy fibonacci
+in tìmFibonacci(30)
