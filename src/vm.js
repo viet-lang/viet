@@ -9,8 +9,8 @@ const Message = {
         return `Chỉ có thể thực hiện phép ${op} giữa hai số, ` +
             `không chấp nhận kiểu '${VM.typeName(a)}' với '${VM.typeName(b)}'.`;
     },
-    binopsError: function(op, a, b) {
-        return `Chỉ có thể thực hiện phép ${op} giữa hai số hoặc hai chuỗi, ` +
+    binAddError: function(a, b) {
+        return `Chỉ có thể thực hiện phép cộng giữa hai số hoặc chuỗi và bất kỳ kiểu nào, ` +
             `không chấp nhận kiểu '${VM.typeName(a)}' với '${VM.typeName(b)}'.`;
     },
     unopError: function(op, a) {
@@ -218,14 +218,25 @@ class VM
                 return this.runtimeError(Message.unopError('lấy âm', this.peek(0)));
             }
             case OP.ADD: {
-                if ((typeof(this.peek(1)) == 'number' && typeof(this.peek(0)) == 'number') ||
-                    (typeof(this.peek(1)) == 'string' && typeof(this.peek(0)) == 'string')) {
+                if (typeof(this.peek(1)) == 'number' && typeof(this.peek(0)) == 'number')  {
                     var b = this.pop();
                     var a = this.pop();
                     this.push(a + b);
                     continue;
                 }
-                return this.runtimeError(Message.binopsError('cộng', this.peek(1), this.peek(0)));
+                else if (typeof(this.peek(1) == 'string')) {
+                    var b = this.pop();
+                    var a = this.pop();
+                    this.push(a + VM.valueToString(b));
+                    continue;
+                }
+                else if (typeof(this.peek(0) == 'string')) {
+                    var b = this.pop();
+                    var a = this.pop();
+                    this.push(VM.valueToString(a) + b);
+                    continue;
+                }
+                return this.runtimeError(Message.binAddError(this.peek(1), this.peek(0)));
             }
             case OP.SUB: {
                 if (typeof(this.peek(1)) == 'number' && typeof(this.peek(0)) == 'number') {
@@ -333,12 +344,12 @@ class VM
                 this.push(value);
                 continue;
             }
-            case OP.GST: {                                     
+            case OP.GST: {
                 var name = this.readConst();
-                if (this.globals[name] === undefined)             
+                if (this.globals[name.toLowerCase()] === undefined)             
                     return this.runtimeError(Message.undefinedError(name));
 
-                this.globals[name] = this.peek(0);
+                this.globals[name.toLowerCase()] = this.peek(0);
                 continue;
             }
 

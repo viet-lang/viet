@@ -58,7 +58,9 @@ const TOKEN = {
     KW_HAVE:            46,
     KW_OF:              47,
     KW_BOX:             48,
-    KW_CONTAINT:        49
+
+    KW_CALL:            49,
+    KW_WITH:            50
 };
 
 class Lexer
@@ -216,6 +218,10 @@ class Lexer
             'của':      TOKEN.KW_OF,
             'trong':    TOKEN.KW_OF,
             'hộp':      TOKEN.KW_BOX,
+
+            'gọi':      TOKEN.KW_CALL,
+            'đi':       TOKEN.KW_CALL,
+            'với':      TOKEN.KW_WITH
         };
         var kw = this.src.substring(this.start, this.current);
         var type = map[kw.toLowerCase()];

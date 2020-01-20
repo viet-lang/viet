@@ -223,7 +223,7 @@ class Parser
 
     static identifiersEqual(a, b) {  
         if (a.length != b.length) return false;         
-        return a.start === b.start;
+        return (a.start.toLowerCase() == b.start.toLowerCase());
     }
 
     resolveLocal(compiler, name) {
@@ -444,6 +444,22 @@ class Parser
         self.emitBytes(OP.BOX, count);
     }
 
+    static kw_call(self, canAssign) {
+        var argc = 0;
+        self.expression();
+        if (self.match(TOKEN.KW_WITH)) {
+            do {
+                self.expression();
+                if (argc++ >= 32) {
+                    self.error("Không thể vượt quá 32 tham số.");
+                    return;
+                }
+            } while (self.match(TOKEN.COMMA));
+        }
+        self.emitBytes(OP.CALL, argc);
+        self.hadCall = true;
+    }
+
     static grouping(self, canAssign) {
         if (self.match(TOKEN.RIGHT_PAREN)) {
             self.emitByte(OP.NIL);
@@ -574,6 +590,8 @@ class Parser
         [ null,             Parser.have,    PREC.CALL ],        // KW_HAVE
         [ null,             Parser.of_,     PREC.CALL ],        // KW_OF
         [ Parser.kw_box,    null,           PREC.NONE ],        // KW_BOX
+        [ Parser.kw_call,   null,           PREC.CALL],         // KW_CALL
+        [ null,             null,           PREC.NONE]          // KW_WITH
     ];
 
     parsePrecedence(precedence, message = null) {
