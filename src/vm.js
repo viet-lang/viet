@@ -17,9 +17,6 @@ const Message = {
         return `Chỉ có thể thực hiện phép ${op} của một số, ` +
             `không chấp nhận kiểu '${VM.typeName(a)}'.`;
     },
-    undefinedError: function(name) {
-        return `Biến '${name}' chưa được khai báo.`;
-    },
     invalidCall: function(a) {
         return `Chỉ có thể gọi được hàm, không chấp nhận kiểu '${VM.typeName(a)}'.`;
     },
@@ -28,9 +25,6 @@ const Message = {
     },
     wrongArgc: function(expected, got) {
         return `Hàm có ${expected} tham số, nhưng truyền vào là ${got}.`;
-    },
-    properError: function(name) {
-        return `Thuộc tính '${name}' chưa được định nghĩa.`;
     },
     accessError: function(a) {
         return `Chỉ có thể truy cập thuộc tính trong hộp, không chấp nhận kiểu '${VM.typeName(a)}'.`;
@@ -395,9 +389,6 @@ class VM
                     var name = this.readConst();
                     var value = box.get(name);
                    
-                    if (value === undefined)
-                        return this.runtimeError(Message.properError(name));
-
                     this.pop();
                     this.push(value);
                     continue;
@@ -437,9 +428,6 @@ class VM
                         var index = this.peek(0);
                         var value = box.get(index);
 
-                        if (value === undefined)
-                            return this.runtimeError(Message.properError(index));
-            
                         this.pop();
                         this.pop();
                         this.push(value);
@@ -487,9 +475,6 @@ class VM
                         var index = this.peek(1);
                         var value = box.get(index);
 
-                        if (value === undefined)
-                            return this.runtimeError(Message.properError(index));
-                        
                         this.pop();
                         this.pop();
                         this.push(value);
