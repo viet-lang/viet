@@ -773,8 +773,10 @@ class Parser
             return;
         }
 
-        if (this.match(TOKEN.SEMICOLON) ||
-            this.check(TOKEN.END)) {
+        if (this.match(TOKEN.SEMICOLON) ||              // ; follow
+            this.check(TOKEN.RIGHT_BRACE) ||            // } after
+            this.check(TOKEN.END) ||                    // $END after
+            this.current.line > this.previous.line) {   // New line
             this.emitReturn();
         } else {
             this.expression();
