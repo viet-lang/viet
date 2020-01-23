@@ -330,35 +330,31 @@ class VM
                 continue;
             }
 
-            case OP.DEF: {               
+            
+            case OP.DEF: {  // Define global: [k] [-1, +0]
                 var name = this.readConst();
                 this.globals[name.toLowerCase()] = this.pop();
                 continue;
             }
-            case OP.GLD: {
+            case OP.GLD: { // Get global: [k] [-0, +1]
                 var name = this.readConst();
                 var value = this.globals[name.toLowerCase()];
-                if (value === undefined)
-                    return this.runtimeError(Message.undefinedError(name));
-
+                if (value === undefined) value = null;
                 this.push(value);
                 continue;
             }
-            case OP.GST: {
+            case OP.GST: { // Set global: [k] [-0, +0]
                 var name = this.readConst();
-                if (this.globals[name.toLowerCase()] === undefined)             
-                    return this.runtimeError(Message.undefinedError(name));
-
                 this.globals[name.toLowerCase()] = this.peek(0);
                 continue;
             }
 
-            case OP.LD: {
+            case OP.LD: { // Get local: [i] [-0, +1]
                 var slot = this.readByte();
                 this.push(this.stack[frame.top + slot]);
                 continue;
             }
-            case OP.ST: {
+            case OP.ST: { // Set local: [i] [-0, +0]
                 var slot = this.readByte();
                 this.stack[frame.top + slot] = this.peek(0);  
                 continue;
