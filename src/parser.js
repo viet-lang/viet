@@ -656,7 +656,11 @@ class Parser
         this.consume(TOKEN.RIGHT_PAREN, "Thiếu đóng ngoặc ')' sau tham số.");   
       
         // The body.
-        if (this.match(TOKEN.LEFT_BRACE)) {
+        if (this.match(TOKEN.EQUAL)) {
+            this.expression();
+            this.emitByte(OP.RET);
+        }
+        else if (this.match(TOKEN.LEFT_BRACE)) {
             while (!this.check(TOKEN.RIGHT_BRACE) &&
                 !this.check(TOKEN.EOF)) {
                 this.declaration();
