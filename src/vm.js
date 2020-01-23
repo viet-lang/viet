@@ -496,9 +496,9 @@ class VM
 
     interpret(source)
     {
-        var parser = new Parser(source);
+        var parser = new Parser();
 
-        var func = parser.compile();
+        var func = parser.compile(source);
         if (func == null) return STATUS.COMPILE_ERROR;
 
         this.push(func); 

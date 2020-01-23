@@ -20,8 +20,11 @@ const FUNC = {
 
 class Parser
 {
-    constructor(source)
+    constructor()
     {
+    }
+
+    init(source) {
         this.lexer = new Lexer(source);
         this.compiler = null;     
 
@@ -83,7 +86,11 @@ class Parser
         }
 
         console.log(str + ": " + message);                          
-        this.hadError = true;                                      
+        this.hadError = true;
+
+        if (this.checker) {
+            this.checker(token.line, token.column, message);
+        }
     }
 
     error(message) {
@@ -683,7 +690,7 @@ class Parser
     funDeclaration() {
         if (this.compiler.type != FUNC.SCRIPT ||
             this.compiler.scopeDepth > 0) {
-            this.error("Hàm phải được khai báo trong than chương trình.");
+            this.error("Hàm phải được khai báo trong thân chương trình.");
             return;
         }
 
@@ -920,15 +927,19 @@ class Parser
         this.match(TOKEN.SEMICOLON);
     }
 
-    compile() {
+    compile(source, checker = null) {
+        this.checker = checker;
+        this.init(source);
         this.advance();                                      
         
         if (!this.match(TOKEN.EOF)) {
             do {
                 this.declaration();
+                if (this.hadError) break;
             } while (!this.match(TOKEN.EOF));
         }
 
+        if (checker) return this.hadError;
         var func = this.endCompiler();
         return this.hadError ? null : func;
     }
