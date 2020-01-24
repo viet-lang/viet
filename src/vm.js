@@ -364,6 +364,13 @@ class VM
                 if (!this.peek(0)) frame.pc += offset;
                 continue;
             }
+            case OP.JNE: {
+                var offset = this.readWord();
+                var cond = this.pop();
+                if (this.peek(0) != cond) frame.pc += offset;
+                else this.pop();
+                continue;
+            }
             case OP.LOOP: {
                 var offset = this.readWord();
                 frame.pc -= offset;

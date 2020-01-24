@@ -598,7 +598,11 @@ class Parser
         [ null,             Parser.of_,     PREC.CALL ],        // KW_OF
         [ Parser.kw_box,    null,           PREC.NONE ],        // KW_BOX
         [ Parser.kw_call,   null,           PREC.CALL],         // KW_CALL
-        [ null,             null,           PREC.NONE]          // KW_WITH
+        [ null,             null,           PREC.NONE],         // KW_WITH
+
+        [ null,             null,           PREC.NONE],          // KW_WITH
+        [ null,             null,           PREC.NONE],          // KW_WITH
+        [ null,             null,           PREC.NONE],          // KW_WITH
     ];
 
     parsePrecedence(precedence, message = null) {
@@ -868,6 +872,49 @@ class Parser
         current.currentLoop = null;
     }
 
+    matchStatement()
+    {
+        this.expression();
+        var hadBrace = this.match(TOKEN.LEFT_BRACE);
+
+        var caseCount = 0;
+        var jmpOuts = [];
+
+        if ((hadBrace && !this.check(TOKEN.RIGHT_BRACE)) ||
+            this.match(TOKEN.VERTICAL_BAR)) {
+            do {
+                // Default case.
+                if (this.match(TOKEN.ARROW)) {
+                    this.emitByte(OP.POP);
+                    this.statement();
+                    jmpOuts[caseCount++] = this.emitJump(OP.JMP);
+                    continue;
+                }
+
+                this.expression();
+                var jmpNext = this.emitJump(OP.JNE);
+
+                this.consume(TOKEN.ARROW, "Extect '=>' after expression.");
+                this.statement();
+            
+                jmpOuts[caseCount++] =  this.emitJump(OP.JMP);
+                this.patchJump(jmpNext);
+
+            } while ((hadBrace && this.match(TOKEN.COMMA) &&
+                !this.check(TOKEN.RIGHT_BRACE)) || this.match(TOKEN.VERTICAL_BAR));
+        }
+
+        if (hadBrace) {
+            this.consume(TOKEN.RIGHT_BRACE, "Exprect '}' after 'match' stmt body.");
+            return;
+        }
+
+        // Pop the input value.
+        this.emitByte(OP.POP);
+        // Patch all endings.
+        for (var i = 0; i < caseCount; i++) this.patchJump(jmpOuts[i]);
+    }
+
     synchronize() {                             
         this.panicMode = false;
 
@@ -914,6 +961,8 @@ class Parser
             this.breakStatement(); 
         } else if (this.match(TOKEN.WHILE)) {
             this.whileStatement();
+        } else if (this.match(TOKEN.KW_MATCH)) {
+            this.matchStatement();
         } else if (this.match(TOKEN.LEFT_BRACE)) {
             this.beginScope();                      
             this.block();                           

@@ -60,7 +60,11 @@ const TOKEN = {
     KW_BOX:             48,
 
     KW_CALL:            49,
-    KW_WITH:            50
+    KW_WITH:            50,
+    KW_MATCH:           51,
+
+    ARROW:              52,
+    VERTICAL_BAR:       53
 };
 
 class Lexer
@@ -197,8 +201,6 @@ class Lexer
             'hoặc':     TOKEN.OR,
             'in':       TOKEN.PRINT,
             'trả':      TOKEN.RETURN,
-            'SUPER':    TOKEN.SUPER,
-            'THIS':     TOKEN.THIS,
             'đúng':     TOKEN.TRUE,
             'biến':     TOKEN.VAR,
             'khi':      TOKEN.WHILE,
@@ -221,7 +223,9 @@ class Lexer
 
             'gọi':      TOKEN.KW_CALL,
             'đi':       TOKEN.KW_CALL,
-            'với':      TOKEN.KW_WITH
+            'với':      TOKEN.KW_WITH,
+
+            'sánh':     TOKEN.KW_MATCH
         };
         var kw = this.src.substring(this.start, this.current);
         var type = map[kw.toLowerCase()];
@@ -287,14 +291,18 @@ class Lexer
             case ';': return this.makeToken(TOKEN.SEMICOLON);
             case ',': return this.makeToken(TOKEN.COMMA);
             case '.': return this.makeToken(TOKEN.DOT);
-            case '-': return this.makeToken(TOKEN.MINUS);
+            case '|': return this.makeToken(TOKEN.VERTICAL_BAR);
             case '+': return this.makeToken(TOKEN.PLUS);
             case '/': return this.makeToken(TOKEN.SLASH);
             case '*': return this.makeToken(TOKEN.STAR);
+
+            case '-':
+                return this.makeToken(this.match('>') ? TOKEN.ARROW : TOKEN.MINUS);            
             
             case '!':
                 return this.makeToken(this.match('=') ? TOKEN.BANG_EQUAL : TOKEN.BANG);  
-            case '=':                                                        
+            case '=':
+                if (this.match('>')) return this.makeToken(TOKEN.ARROW); 
                 return this.makeToken(this.match('=') ? TOKEN.EQUAL_EQUAL : TOKEN.EQUAL);
             case '<':                                                        
                 return this.makeToken(this.match('=') ? TOKEN.LESS_EQUAL : TOKEN.LESS);  

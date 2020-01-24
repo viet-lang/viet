@@ -30,18 +30,19 @@ const OP = {
     LD:     20,
     ST:     21,
 
-    JMP:    22,
-    JMPF:   23,
-    LOOP:   24,
+    BOX:    22,
+    GET:    23,
+    SET:    24,
+    GETI:   25,
+    SETI:   26,
+    OF:     27,
 
-    EXIT:   25,
+    JMP:    28,
+    JMPF:   29,
+    JNE:    30,
+    LOOP:   31,
 
-    BOX:    26,
-    GET:    27,
-    SET:    28,
-    GETI:   29,
-    SETI:   30,
-    OF:     31
+    EXIT:   32
 };
 
 class Chunk {
